@@ -68,6 +68,11 @@ public class MigrosProductProvider : IProductProvider
                 ImageUrl = GetImageFromJsonDocument(arrayEnumerator.Current)
             };
         }
+        catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogInformation("Product not found in Migros: {ProductIds}", productIds);
+            return null;
+        }
         catch (HttpRequestException httpRequestException)
         {
             _logger.LogError(httpRequestException,
@@ -121,6 +126,11 @@ public class MigrosProductProvider : IProductProvider
             using JsonDocument jsonDocument = JsonDocument.Parse(content);
             JsonElement productIdsElement = jsonDocument.RootElement.GetProperty("productIds");
             return productIdsElement.EnumerateArray().Select(jsonElement => jsonElement.GetInt32()).ToList();
+        }
+        catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogInformation("Product not found in Migros: {Gtin}", gtin);
+            return ImmutableList<int>.Empty;
         }
         catch (HttpRequestException httpRequestException)
         {

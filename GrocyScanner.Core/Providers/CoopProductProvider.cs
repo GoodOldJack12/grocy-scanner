@@ -68,6 +68,11 @@ public class CoopProductProvider : IProductProvider
                 ImageUrl = GetBestQualityImage(element.Image)
             };
         }
+        catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogInformation("Product not found in Coop: {Gtin}", gtin);
+            return null;
+        }
         catch (HttpRequestException httpRequestException)
         {
             _logger.LogError(httpRequestException, "Failed to fetch coop product: {Gtin} - {JsonResponse}", gtin,
