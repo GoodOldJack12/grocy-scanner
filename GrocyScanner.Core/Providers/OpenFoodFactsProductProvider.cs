@@ -34,6 +34,11 @@ public class OpenFoodFactsProductProvider : IProductProvider
                 Categories = product.Product.CategoriesTags
             };
         }
+        catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogInformation("Product not found in Open Food Facts: {Gtin}", gtin);
+            return null;
+        }
         catch (HttpRequestException httpRequestException)
         {
             _logger.LogError(httpRequestException, "Unable to request {Gtin}", gtin);
