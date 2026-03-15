@@ -7,6 +7,7 @@
 @inject IGrocyClient GrocyClient
 @inject IBestValueCalculator BestValueCalculator
 @inject ISnackbar Snackbar
+@inject ILogger<AddProductDialog> Logger
 
 <MudDialog>
     <DialogContent>
@@ -125,7 +126,18 @@
         // product is not known, must be searched in the providers
         if (productFromGrocy == null)
         {
-            Product?[] products = await Task.WhenAll(ProductProviders.Select(async provider => await provider.GetProductByGtin(Barcode)));
+            Product?[] products = await Task.WhenAll(ProductProviders.Select(async provider =>
+            {
+                try
+                {
+                    return await provider.GetProductByGtin(Barcode);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e, "Error retrieving product from {ProviderName}", provider.GetType().Name);
+                    return null;
+                }
+            }));
             Product = BestValueCalculator.GetProductWithMostValue(products.Where(product => product != null).Cast<Product>().ToList());
             if (Product == null)
             {
