@@ -14,7 +14,9 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5236",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Grocy__BaseUrl": "http://grocy.internal/",
+        "Grocy__ApiKey": "pCrbzRPPuEU3bEvGvA3PYko7OKvjtb7O8D72L2wDwopR2R94SN"
       }
     },
     "https": {

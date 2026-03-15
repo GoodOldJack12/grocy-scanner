@@ -98,7 +98,6 @@
 
         hubConnection.On<string>("BarcodeScanned", async barcode =>
         {
-            barcode = GtinValidator.ParseBarcode(barcode);
             await InvokeAsync(async () => await OpenPurchaseDialogAsync(barcode));
             await InvokeAsync(StateHasChanged);
         });
@@ -125,11 +124,12 @@
 
     private async Task OnInternalValueChanged()
     {
-        Barcode = GtinValidator.ParseBarcode(Barcode);
         if (string.IsNullOrEmpty(Barcode ) || !GtinValidator.Validate(Barcode))
         {
             return;
         }
+
+        string parsedBarcode = GtinValidator.ParseBarcode(Barcode);
 
         switch (ScannerMode)
         {
@@ -138,7 +138,7 @@
                 break;
             case ScannerMode.Consume:
             case ScannerMode.ConsumeSpoiled:
-                int? productId = await GrocyClient.GetProductIdByBarcode(Barcode);
+                int? productId = await GrocyClient.GetProductIdByBarcode(parsedBarcode);
 
                 if (!productId.HasValue)
                 {

@@ -98,7 +98,7 @@
 
     [Parameter]
     public required string Barcode { get; set; }
-
+    
     // state management
     private bool IsLoading { get; set; }
 
@@ -122,8 +122,13 @@
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
+        if (GtinValidator.isGS1(Barcode))
+        {
+            FormBestBefore = GtinValidator.GetExpiryDate(Barcode);
+        }
         Barcode = GtinValidator.ParseBarcode(Barcode);
-        
+
+
         Product? productFromGrocy = await GrocyClient.GetProductByBarcode(Barcode);
 
         // product is not known, must be searched in the providers

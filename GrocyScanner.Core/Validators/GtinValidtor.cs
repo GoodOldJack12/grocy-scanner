@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace GrocyScanner.Core.Validators;
 
@@ -29,5 +30,28 @@ public class GtinValidator : IGtinValidator
         }
 
         return barcode;
+    }
+    
+    public bool isGS1(string barcode)
+    {
+        return barcode.Length >= 24 && barcode.StartsWith("01") && barcode.Substring(16, 2) == "17";
+    }
+    
+    public DateTime? GetExpiryDate(string barcode)
+    {
+        if (!isGS1(barcode))
+            return null;
+
+        string dateStr = barcode.Substring(18, 6);
+    
+        if (dateStr.EndsWith("00"))
+            dateStr = dateStr.Substring(0, 4) + "01"; // parse as 1st, then get end of month
+    
+        var date = DateTime.ParseExact(dateStr, "yyMMdd",CultureInfo.InvariantCulture);
+    
+        if (barcode.Substring(22, 2) == "00")
+            date = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+    
+        return date;
     }
 }
