@@ -2,12 +2,14 @@
 @using GrocyScanner.Core.GrocyClient
 @using GrocyScanner.Core.Providers
 @using GrocyScanner.Core.ValueCalculator
+@using GrocyScanner.Core.Validators
 @using Humanizer
 @inject IEnumerable<IProductProvider> ProductProviders
 @inject IGrocyClient GrocyClient
 @inject IBestValueCalculator BestValueCalculator
 @inject ISnackbar Snackbar
 @inject ILogger<AddProductDialog> Logger
+@inject IGtinValidator GtinValidator
 
 <MudDialog>
     <DialogContent>
@@ -120,6 +122,7 @@
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
+        Barcode = GtinValidator.ParseBarcode(Barcode);
         
         Product? productFromGrocy = await GrocyClient.GetProductByBarcode(Barcode);
 

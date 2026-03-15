@@ -98,6 +98,7 @@
 
         hubConnection.On<string>("BarcodeScanned", async barcode =>
         {
+            barcode = GtinValidator.ParseBarcode(barcode);
             await InvokeAsync(async () => await OpenPurchaseDialogAsync(barcode));
             await InvokeAsync(StateHasChanged);
         });
@@ -124,6 +125,7 @@
 
     private async Task OnInternalValueChanged()
     {
+        Barcode = GtinValidator.ParseBarcode(Barcode);
         if (string.IsNullOrEmpty(Barcode ) || !GtinValidator.Validate(Barcode))
         {
             return;
